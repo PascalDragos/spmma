@@ -1,16 +1,30 @@
-import colorsys
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
+import colorsys
 from PIL import Image, ImageDraw, ImageFont
 import ST7735
+
+
+l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
+logger = logging.getLogger("spi")  # instanta de logger
+logger.setLevel(logging.DEBUG) # afisez informatiile de la debug in sus
+handler = TimedRotatingFileHandler('logs/spi.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
+handler.setFormatter(l_format) 
+handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
+logger.addHandler(handler)
 
 
 # Consumer 1
 def spi_loop(q):
     try:
+        logger.debug("SPI loop starts...")
         disp = ST7735.ST7735(port=0, cs=1, backlight=12, rotation=90, spi_speed_hz=10000000, dc=9)
         disp.begin()
         WIDTH = disp.width
         HEIGHT = disp.height
+
+        logger.debug("SPI objects created")
         
         font_size = 20
         # Font optimizat pentru ecrane mici, by Intel
@@ -32,6 +46,7 @@ def spi_loop(q):
 
         while True:
             (variable, data) = q.get()
+            logger.info((variable, data))
             if variable == "sleep":
                 disp.set_backlight(data)
                 continue
@@ -71,3 +86,4 @@ def spi_loop(q):
 
     except KeyboardInterrupt:
         print("SPI loop stops...")
+        logger.debug("SPI loop stops...")

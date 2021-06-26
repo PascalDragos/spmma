@@ -1,4 +1,7 @@
 import threading
+import time
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
 from misc.message import MessageType
 from misc.message import ButtonType
@@ -11,6 +14,17 @@ from modules.ltr import LTR_Wrapper
 PROXIMTY_SLEEP_TRESHOLD = 1500
 PROXIMTY_NEXT_TRESHOLD = 100
 
+
+
+l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
+logger = logging.getLogger("i2c")  # instanta de logger
+logger.setLevel(logging.DEBUG) # afisez informatiile de la debug in sus
+handler = TimedRotatingFileHandler('logs/i2c.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
+handler.setFormatter(l_format) 
+handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
+logger.addHandler(handler)
+
+
 # exista 2 threaduri care acceseaza LTR
 # sincronizare cu semafoare
 lock = threading.Lock()
@@ -18,23 +32,29 @@ lock = threading.Lock()
 # Producer 1
 def i2c_loop(q):
     try:
+        logger.debug("I2c loop starts...")
         bme280 = BME280()
         bme280.set_operation_mode(operation_mode="weather")
         adc = ADC()
         ltr = LTR_Wrapper()
 
+        logger.debug("Objects created")
+
         button_delay = 0.1  # seconds
         button_debounce = 2 # seconds
         read_delay = 0.1  # seconds
 
+        logger.debug("Processes start...")
         button_thread(q, ltr, button_delay, button_debounce)
         sensor_thread(q, bme280, adc, ltr, read_delay)
 
         while(True):
-            pass
+            # for keeping alive
+            time.sleep(60*60)
 
     except KeyboardInterrupt:
         print("I2C loop stops...")
+        logger.debug("I2c loop stops...\n\n")
 
 
 def button_thread(q, ltr, button_delay, button_debounce):
@@ -42,12 +62,14 @@ def button_thread(q, ltr, button_delay, button_debounce):
     proximity = ltr.get_proximity()
     lock.release()
     if proximity > PROXIMTY_SLEEP_TRESHOLD:
+        logger.info((MessageType.BTN_MESSAGE, ButtonType.SLEEP))   
         q.put((MessageType.BTN_MESSAGE, ButtonType.SLEEP))
         # dau mesaj sa afisez alta valoare pe ecran
         t = threading.Timer(button_debounce, button_thread, [q, ltr, button_delay, button_debounce])
         t.daemon = True
         t.start()
     elif proximity > PROXIMTY_NEXT_TRESHOLD:
+        logger.info((MessageType.BTN_MESSAGE, ButtonType.NEXT))
         q.put((MessageType.BTN_MESSAGE, ButtonType.NEXT))
         t = threading.Timer(button_debounce, button_thread, [q, ltr, button_delay, button_debounce])
         t.daemon = True
@@ -83,6 +105,8 @@ def sensor_thread(q, bme280, adc, ltr, read_delay):
 
     i2c_object = (weather_parameters, gases, lux, proximity)
 
+
+    logger.info((MessageType.I2C_MESSAGE,i2c_object))
     q.put((MessageType.I2C_MESSAGE, i2c_object))
 
     # print(i2c_object)

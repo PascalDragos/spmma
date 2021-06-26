@@ -3,7 +3,19 @@ import datetime
 import json
 import logging
 
+import logging
+from logging.handlers import TimedRotatingFileHandler
+
 from misc.message import MessageType
+
+
+l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
+logger = logging.getLogger("web")  # instanta de logger
+logger.setLevel(logging.DEBUG) # afisez informatiile de la debug in sus
+handler = TimedRotatingFileHandler('logs/web.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
+handler.setFormatter(l_format) 
+handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
+logger.addHandler(handler)
 
 
 def time_format(dt):
@@ -20,14 +32,13 @@ def get_time():
 
 def web_loop(q):
     try:
+        logger.debug("WEB loop starts...")
+
         f = open('web.cfg',)
         cfg = json.load(f)
-        domain = cfg["address"] + ":" + cfg["port"]
 
-        logging.basicConfig(filename="web.log",
-                        format='%(asctime)s %(message)s',
-                        filemode='w')
-        logger=logging.getLogger()
+        domain = cfg["address"] + ":" + cfg["port"]
+        logger.debug(f"WEB loop on domain: {domain}")
 
         while True:
             (type, obj) = q.get()  # blocanta
@@ -36,7 +47,6 @@ def web_loop(q):
             print((type, obj))
             
             if type is MessageType.I2C_MESSAGE:
-                print("I2c message")
                 (weather_parameters, gases, lux, proximity) = obj
                 data = {
                     "date": now,
@@ -45,7 +55,7 @@ def web_loop(q):
                     "pressure": weather_parameters['p'],
                     "tmp36": weather_parameters['rt']
                 }
-                print(data)
+                logger.info(domain + "/weather, data: ", data)
                 requests.post(domain + "/weather", data=data)
 
                 data = {
@@ -54,7 +64,8 @@ def web_loop(q):
                     "red": gases['red'],
                     "nh3": gases['nh3']
                 } 
-                print(data)
+                
+                logger.info(domain + "/gas, data: ", data)
                 requests.post(domain + "/gas", data=data)
 
                 data = {
@@ -62,18 +73,19 @@ def web_loop(q):
                     "light": lux,
                     "proximity": proximity
                 }
-                print(data)
+                
+                logger.info(domain + "/light, data: ", data)
                 requests.post(domain + "/light", data=data)
             
             elif type is MessageType.I2S_MESSAGE:
-                print("I2S message")
+         
                 (db, freq) = obj
                 data = {
                     "date": now,
                     "db": db,
                     "freq": freq,
                 }
-                print(data)
+                logger.info(domain + "/sound, data: ", data)
                 requests.post(domain + "/sound", data=data)
 
             else:
@@ -83,7 +95,7 @@ def web_loop(q):
         logger.error("Error in communication loop")
 
     except KeyboardInterrupt:
-        logger.error("Server communication loop stops...")
+        logger.debug("Server communication loop stops...")
 
 
 # Pentru testare

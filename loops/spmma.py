@@ -18,6 +18,7 @@ Prin interfata WiFi se comunica cu
 
 import multiprocessing
 import logging
+from logging.handlers import TimedRotatingFileHandler
 
 from misc.message import MessageType
 from misc.message import ButtonType
@@ -28,12 +29,17 @@ from spi import spi_loop
 from i2s import i2s_loop
 
 
-def main():
-    logging.basicConfig(filename="spmma.log",
-                    format='%(asctime)s %(message)s',
-                    filemode='w')
-    logger=logging.getLogger()
 
+l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
+logger = logging.getLogger("spmma")  # instanta de logger
+logger.setLevel(logging.DEBUG)
+handler = TimedRotatingFileHandler('logs/spmma.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
+handler.setFormatter(l_format) 
+handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
+logger.addHandler(handler)
+
+
+def main():
     # cozi partajate intre procese python
     queue_sensors = multiprocessing.Queue()
     queue_display = multiprocessing.Queue()
@@ -45,11 +51,16 @@ def main():
     process_spi = multiprocessing.Process(target=spi_loop, args=(queue_display,))
     process_web = multiprocessing.Process(target=web_loop, args=(queue_web,))
 
+    logger.debug("Queue and processes created")
+
     # pornim procesele
     process_i2c.start()
     # process_i2s.start()
     process_spi.start()
     # process_web.start()
+
+    logger.debug("Processes started")
+    logger.debug("i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)")
 
     current_variable = 0
     variables = ["t",  "p", "h", "l", "ox", "red", "nh3"]
@@ -57,14 +68,16 @@ def main():
     while True:
         # proceseaza un mesaj venit de la interfata i2c sau i2s 
         sensor_object = queue_sensors.get()  # functie blocanta
-        print(sensor_object)
+        logger.info(sensor_object)
 
         (type, obj) = sensor_object
         if type is MessageType.I2C_MESSAGE:
             (weather_parameters, gases, lux, proximity) = obj
             
             param = variables[current_variable]
-            if param in ["t",  "p", "h"]:
+            if param == "t":
+                queue_display.put((param, weather_parameters["rt"]))
+            elif param in ["p", "h"]:
                 queue_display.put((param, weather_parameters[param]))
             elif param in ["ox", "red", "nh3"]:
                 queue_display.put((param, gases[param]))
@@ -94,6 +107,8 @@ def main():
             
 if __name__ == "__main__":
     try:
+        print("SPMMA starts...")
         main()
     except KeyboardInterrupt:
-        print("\nSPMMA app stops...")
+        print("\nSPMMA stops...")
+        logger.debug("SPMMA app stops...\n\n")
