@@ -18,9 +18,10 @@ logger.addHandler(handler)
 # producer 2
 def i2s_loop(q):
     try:
+        print("I2s loop starts...")
         logger.debug("I2s loop starts...")
         mic_delay = 1  # seconds
-        mic = Microphone(duration=1)
+        mic = Microphone(duration=5)
         logger.debug("I2s objects created...")
 
         while True:
@@ -30,12 +31,12 @@ def i2s_loop(q):
             freq = round(freq, 0)
 
             logger.info((db, freq))
-            q.put((MessageType.I2S_MESSAGE, db, freq))
+            q.put((MessageType.I2S_MESSAGE, (db, freq)))
             
             time.sleep(mic_delay)
     except KeyboardInterrupt:
         print("I2S loop stops...")
-        logger.debug("I2s loop stops...")
+        logger.debug("I2s loop stops...\n")
 
 
 # Pentru testare

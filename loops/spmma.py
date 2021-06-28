@@ -55,9 +55,9 @@ def main():
 
     # pornim procesele
     process_i2c.start()
-    # process_i2s.start()
+    process_i2s.start()
     process_spi.start()
-    # process_web.start()
+    process_web.start()
 
     logger.debug("Processes started")
     logger.debug("i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)")
@@ -110,5 +110,5 @@ if __name__ == "__main__":
         print("SPMMA starts...")
         main()
     except KeyboardInterrupt:
-        print("\nSPMMA stops...")
-        logger.debug("SPMMA app stops...\n\n")
+        print("SPMMA stops...")
+        logger.debug("SPMMA app stops...\n")

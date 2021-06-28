@@ -18,6 +18,7 @@ logger.addHandler(handler)
 # Consumer 1
 def spi_loop(q):
     try:
+        print("SPI loop starts...")
         logger.debug("SPI loop starts...")
         disp = ST7735.ST7735(port=0, cs=1, backlight=12, rotation=90, spi_speed_hz=10000000, dc=9)
         disp.begin()
@@ -86,4 +87,4 @@ def spi_loop(q):
 
     except KeyboardInterrupt:
         print("SPI loop stops...")
-        logger.debug("SPI loop stops...")
+        logger.debug("SPI loop stops...\n")

@@ -32,6 +32,7 @@ def get_time():
 
 def web_loop(q):
     try:
+        print("Web loop starts...")
         logger.debug("WEB loop starts...")
 
         f = open('web.cfg',)
@@ -40,11 +41,13 @@ def web_loop(q):
         domain = cfg["address"] + ":" + cfg["port"]
         logger.debug(f"WEB loop on domain: {domain}")
 
+        web_session = requests.Session()
+        web_session.headers.update({"pass" : cfg["password"]})
+
         while True:
             (type, obj) = q.get()  # blocanta
             now =  get_time()  # prima functie, vreau timpul cat mai exact
-            print("WEB: ")
-            print((type, obj))
+            logger.info(f"Received {(type, obj)}")
             
             if type is MessageType.I2C_MESSAGE:
                 (weather_parameters, gases, lux, proximity) = obj
@@ -55,8 +58,8 @@ def web_loop(q):
                     "pressure": weather_parameters['p'],
                     "tmp36": weather_parameters['rt']
                 }
-                logger.info(domain + "/weather, data: ", data)
-                requests.post(domain + "/weather", data=data)
+                logger.info(domain + "/weather, POST, data: " + str(data))
+                web_session.post(domain + "/weather", data=data)
 
                 data = {
                     "date": now,
@@ -65,8 +68,8 @@ def web_loop(q):
                     "nh3": gases['nh3']
                 } 
                 
-                logger.info(domain + "/gas, data: ", data)
-                requests.post(domain + "/gas", data=data)
+                logger.info(domain + "/gas, POST, data: " + str(data))
+                web_session.post(domain + "/gas", data=data)
 
                 data = {
                     "date": now,
@@ -74,8 +77,8 @@ def web_loop(q):
                     "proximity": proximity
                 }
                 
-                logger.info(domain + "/light, data: ", data)
-                requests.post(domain + "/light", data=data)
+                logger.info(domain + "/light, POST, data: " + str(data))
+                web_session.post(domain + "/light", data=data)
             
             elif type is MessageType.I2S_MESSAGE:
          
@@ -85,18 +88,24 @@ def web_loop(q):
                     "db": db,
                     "freq": freq,
                 }
-                logger.info(domain + "/sound, data: ", data)
-                requests.post(domain + "/sound", data=data)
+                logger.info(domain + "/sound, POST, data: " + str(data))
+                web_session.post(domain + "/sound", data=data)
 
             else:
                 logger.error("Tipul mesajului MessageType necunoscut")
 
+
     except InterruptedError:
+        print("Error in communication loop")
         logger.error("Error in communication loop")
 
     except KeyboardInterrupt:
-        logger.debug("Server communication loop stops...")
+        print("Web loop stops...")
+        logger.debug("Server communication loop stops...\n")
 
+    except Exception as ex:
+        print("Error in communication loop")
+        logger.error(repr(ex))
 
 # Pentru testare
 if __name__ == "__main__":

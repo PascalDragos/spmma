@@ -32,6 +32,7 @@ lock = threading.Lock()
 # Producer 1
 def i2c_loop(q):
     try:
+        print("I2c loop starts...")
         logger.debug("I2c loop starts...")
         bme280 = BME280()
         bme280.set_operation_mode(operation_mode="weather")
@@ -42,7 +43,7 @@ def i2c_loop(q):
 
         button_delay = 0.1  # seconds
         button_debounce = 2 # seconds
-        read_delay = 0.1  # seconds
+        read_delay = 5  # seconds
 
         logger.debug("Processes start...")
         button_thread(q, ltr, button_delay, button_debounce)
@@ -54,7 +55,7 @@ def i2c_loop(q):
 
     except KeyboardInterrupt:
         print("I2C loop stops...")
-        logger.debug("I2c loop stops...\n\n")
+        logger.debug("I2c loop stops...\n")
 
 
 def button_thread(q, ltr, button_delay, button_debounce):
