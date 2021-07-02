@@ -1,9 +1,6 @@
-
-
 import time
 
 from modules.adc import ADC
-
 
 
 # Pentru testare

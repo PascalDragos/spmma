@@ -58,6 +58,7 @@ def spi_loop(q):
         for variable in info_structure:
             values[variable] = [0] * WIDTH
 
+        y_old = 0
         while True:
             (variable, data) = q.get()
             logger.info((variable, data))
@@ -124,8 +125,10 @@ def spi_loop(q):
             # print(vmin)
             # print(vmax)
 
-            line_y = 0 # coordonata y a puncutului 
+            y_now = 0 # coordonata y a puncutului 
+            y_old = 0
             for i in range(len(colours)):
+                y_old = y_now
                 if(colours[i] == 0):
                     # primele momente cand se deschide aplicatia
                     r, g, b = 0, 0, 0
@@ -137,12 +140,12 @@ def spi_loop(q):
                         # scalez in intervalul (0,1] => [0, 0.3]
                         colour = colours[i] * 0.3
                         # Punct negru pentru valoarea curenta
-                        line_y = HEIGHT - ((1 - colours[i]) * (HEIGHT - graph_top_point))                        
+                        y_now = HEIGHT - ((1 - colours[i]) * (HEIGHT - graph_top_point))                        
                     else:
                         # scalez in intervalul (0,1] => [0.3, 0)
                         colour = (1.0 - colours[i]) * 0.3
                         # Punct negru pentru valoarea curenta
-                        line_y = HEIGHT - (colours[i] * (HEIGHT - graph_top_point))
+                        y_now = HEIGHT - (colours[i] * (HEIGHT - graph_top_point))
                     
                     # schimb hue, saturatie si luminanta maxima
                     r, g, b = [int(x * 255.0) for x in colorsys.hsv_to_rgb(colour, 1.0, 1.0)]
@@ -151,7 +154,19 @@ def spi_loop(q):
                 draw.rectangle((i, graph_top_point, i + 1, HEIGHT), (r, g, b))
 
                 # Punct (1x3 de fapt) negru pentru valoarea curenta
-                draw.rectangle((i, line_y-1, i + 1, line_y + 1), (0, 0, 0))
+                if y_old == 0:
+                    y1 = y_now
+                    y2 = y_now
+                elif y_now < y_old:
+                    y1 = y_old
+                    y2 = y_now
+                else:
+                    y1 = y_now
+                    y2 = y_old
+
+                # y1 e mai mare, e mai jos
+                # y2 e mai mic, e mai sus
+                draw.rectangle((i, y1 + 1, i + 1, y2 - 1), (0, 0, 0))
 
             # Afisarea in text a marimii si valorii curente
             draw.text((0, 0), message, font=font, fill=(255, 255, 255))

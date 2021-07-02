@@ -1,9 +1,10 @@
 from modules.adc import ADC
 import time
 
+
 adc = ADC()
 
-with open("gas3.txt", "a") as gas_file:
+with open("gas.txt", "a") as gas_file:
     try:
         while True:
             ox = adc.read_OX()

@@ -5,7 +5,6 @@ from misc.message import MessageType
 from modules.mic import Microphone
 
 
-# producer 2
 def i2s_loop():
     try:
         mic_delay = 1  # seconds

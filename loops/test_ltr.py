@@ -1,7 +1,9 @@
 from modules.ltr import LTR_Wrapper
 import time
 
+
 ltr = LTR_Wrapper()
+
 
 while True:
     lux = ltr.get_lux_auto_range()
