@@ -1,15 +1,15 @@
 """
 Procesul master care coordoneaza celelalte procese
 
-Prin interfata I2C se comunica cu 
+Prin interfata I2C se comunica cu
     LTR-559 (senzorul de lumina, proximitate)
     BME280 (senzorul de temperatura, umiditate, presiune)
     ADS1015 (ADC la care sunt conectate rezistentele senzorilor de gaze si TMP36)
 
-Prin interfata I2S se comunica cu 
+Prin interfata I2S se comunica cu
     SPH0645 (microfonul)
 
-Prin interfata SPI se comunica cu 
+Prin interfata SPI se comunica cu
     ecranul IPS aflat pe EnviroPlus
 
 Prin interfata WiFi se comunica cu
@@ -28,13 +28,13 @@ from i2c import i2c_loop
 from spi import spi_loop
 from i2s import i2s_loop
 
-
-
+# Logger
 l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
 logger = logging.getLogger("spmma")  # instanta de logger
 logger.setLevel(logging.DEBUG)
-handler = TimedRotatingFileHandler('logs/spmma.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
-handler.setFormatter(l_format) 
+handler = TimedRotatingFileHandler('logs/spmma.log', when="midnight", interval=1,
+                                   encoding='utf8')  # in fiecare zi, alt fisier
+handler.setFormatter(l_format)
 handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
 logger.addHandler(handler)
 
@@ -57,32 +57,36 @@ def main():
     process_i2c.start()
     process_i2s.start()
     process_spi.start()
-    process_web.start()
+    # process_web.start()
 
     logger.debug("Processes started")
     logger.debug("i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)")
 
     current_variable = 0
-    variables = ["t",  "p", "h", "l", "ox", "red", "nh3"]
+    variables = ["t", "h", "l", "s", "ox", "red", "nh3"]
     display_is_sleeping = False
+
     while True:
-        # proceseaza un mesaj venit de la interfata i2c sau i2s 
+        # proceseaza un mesaj venit de la interfata i2c sau i2s
         sensor_object = queue_sensors.get()  # functie blocanta
         logger.info(sensor_object)
 
         (type, obj) = sensor_object
+        param = variables[current_variable]
         if type is MessageType.I2C_MESSAGE:
             (weather_parameters, gases, lux, proximity) = obj
-            
-            param = variables[current_variable]
+
             if param == "t":
                 queue_display.put((param, weather_parameters["rt"]))
-            elif param in ["p", "h"]:
+            elif param == "h":
                 queue_display.put((param, weather_parameters[param]))
+            elif param == "l":
+                queue_display.put((param, lux))
             elif param in ["ox", "red", "nh3"]:
                 queue_display.put((param, gases[param]))
             else:
-                queue_display.put((param, lux))
+                pass
+            
             # trimite informatiile la procesul care se ocupa de comunicatia cu serverul
             queue_web.put(sensor_object)
 
@@ -98,13 +102,15 @@ def main():
             else:
                 logger.error("Tipul mesajului ButtonType necunoscut")
 
-        elif type is MessageType.I2S_MESSAGE: 
+        elif type is MessageType.I2S_MESSAGE:
+            if param == "s":
+                queue_display.put((param, obj[0]))
             queue_web.put(sensor_object)
 
         else:
             logger.error("Tipul mesajului MessageType necunoscut")
 
-            
+
 if __name__ == "__main__":
     try:
         print("SPMMA starts...")

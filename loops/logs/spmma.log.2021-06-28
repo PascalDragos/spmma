@@ -1,0 +1,68 @@
+DEBUG : 2021-06-28 18:56:28,485 Queue and processes created
+DEBUG : 2021-06-28 18:56:28,632 Processes started
+DEBUG : 2021-06-28 18:56:28,635 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 18:56:29,538 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.76, 'p': 1004.0713, 'h': 61.31, 'rt': 26.4}, {'ox': 5025.0, 'red': 621.0, 'nh3': 299.0}, 3.48, 0))
+INFO : 2021-06-28 18:56:33,859 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3228.0))
+INFO : 2021-06-28 18:56:34,639 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.77, 'p': 1004.0778, 'h': 60.94, 'rt': 26.4}, {'ox': 687.0, 'red': 140946.0, 'nh3': 2384.0}, 3.58, 0))
+INFO : 2021-06-28 18:56:39,781 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.79, 'p': 1004.0688, 'h': 61.29, 'rt': 26.15}, {'ox': 860.0, 'red': 185263.0, 'nh3': 4675.0}, 3.73, 0))
+INFO : 2021-06-28 18:56:40,101 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3257.0))
+INFO : 2021-06-28 18:56:44,913 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.81, 'p': 1004.0595, 'h': 60.99, 'rt': 26.4}, {'ox': 990.0, 'red': 218747.0, 'nh3': 7227.0}, 3.62, 0))
+INFO : 2021-06-28 18:56:46,288 (<MessageType.I2S_MESSAGE: 2>, (48.41, 3263.0))
+INFO : 2021-06-28 18:56:50,052 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.84, 'p': 1004.0643, 'h': 60.87, 'rt': 26.4}, {'ox': 1097.0, 'red': 246102.0, 'nh3': 9954.0}, 3.41, 0))
+INFO : 2021-06-28 18:56:52,457 (<MessageType.I2S_MESSAGE: 2>, (49.38, 3268.0))
+INFO : 2021-06-28 18:56:55,202 (<MessageType.I2C_MESSAGE: 1>, ({'t': 27.86, 'p': 1004.066, 'h': 60.88, 'rt': 26.4}, {'ox': 1192.0, 'red': 271076.0, 'nh3': 11452.0}, 3.4, 0))
+DEBUG : 2021-06-28 18:56:55,252 SPMMA app stops...
+
+DEBUG : 2021-06-28 19:08:14,041 Queue and processes created
+DEBUG : 2021-06-28 19:08:14,179 Processes started
+DEBUG : 2021-06-28 19:08:14,182 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 19:08:15,053 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.18, 'p': 1003.9944, 'h': 53.43, 'rt': 26.5}, {'ox': 6647.0, 'red': 440840.0, 'nh3': 75257.0}, 6.84, 0))
+INFO : 2021-06-28 19:08:19,400 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3309.0))
+INFO : 2021-06-28 19:08:20,151 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.19, 'p': 1003.9874, 'h': 53.75, 'rt': 26.55}, {'ox': 6677.0, 'red': 440840.0, 'nh3': 75445.0}, 6.6, 0))
+INFO : 2021-06-28 19:08:25,286 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.2, 'p': 1003.9803, 'h': 53.57, 'rt': 26.5}, {'ox': 6695.0, 'red': 440840.0, 'nh3': 75257.0}, 6.59, 0))
+INFO : 2021-06-28 19:08:25,644 (<MessageType.I2S_MESSAGE: 2>, (59.74, 3348.0))
+INFO : 2021-06-28 19:08:30,424 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.21, 'p': 1003.9912, 'h': 53.35, 'rt': 26.5}, {'ox': 6719.0, 'red': 440840.0, 'nh3': 75445.0}, 6.61, 0))
+INFO : 2021-06-28 19:08:31,800 (<MessageType.I2S_MESSAGE: 2>, (60.47, 3349.0))
+INFO : 2021-06-28 19:08:35,560 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.23, 'p': 1004.0034, 'h': 53.74, 'rt': 26.55}, {'ox': 6743.0, 'red': 440840.0, 'nh3': 75445.0}, 6.58, 1))
+INFO : 2021-06-28 19:08:37,965 (<MessageType.I2S_MESSAGE: 2>, (60.9, 3353.0))
+INFO : 2021-06-28 19:08:40,702 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.23, 'p': 1003.9995, 'h': 53.37, 'rt': 26.5}, {'ox': 6767.0, 'red': 440840.0, 'nh3': 75635.0}, 6.58, 0))
+INFO : 2021-06-28 19:08:44,129 (<MessageType.I2S_MESSAGE: 2>, (61.28, 3354.0))
+INFO : 2021-06-28 19:08:45,837 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.23, 'p': 1004.0095, 'h': 53.85, 'rt': 26.5}, {'ox': 6790.0, 'red': 440840.0, 'nh3': 75920.0}, 6.58, 0))
+DEBUG : 2021-06-28 19:08:47,473 SPMMA app stops...
+
+DEBUG : 2021-06-28 19:41:20,180 Queue and processes created
+DEBUG : 2021-06-28 19:41:20,313 Processes started
+DEBUG : 2021-06-28 19:41:20,316 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 19:41:21,191 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.54, 'p': 1003.7678, 'h': 52.75, 'rt': 26.2}, {'ox': 10427.0, 'red': 440840.0, 'nh3': 86625.0}, 1.62, 0))
+INFO : 2021-06-28 19:41:25,531 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3320.0))
+INFO : 2021-06-28 19:41:26,289 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.57, 'p': 1003.7577, 'h': 52.46, 'rt': 25.9}, {'ox': 10415.0, 'red': 440840.0, 'nh3': 86625.0}, 1.88, 0))
+INFO : 2021-06-28 19:41:31,432 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.57, 'p': 1003.7659, 'h': 52.09, 'rt': 26.55}, {'ox': 10415.0, 'red': 438139.0, 'nh3': 86403.0}, 1.98, 2))
+INFO : 2021-06-28 19:41:31,767 (<MessageType.I2S_MESSAGE: 2>, (57.68, 3356.0))
+INFO : 2021-06-28 19:41:36,567 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.57, 'p': 1003.7637, 'h': 52.68, 'rt': 26.55}, {'ox': 10427.0, 'red': 440840.0, 'nh3': 86625.0}, 1.88, 0))
+DEBUG : 2021-06-28 19:41:36,677 SPMMA app stops...
+
+DEBUG : 2021-06-28 19:44:34,880 Queue and processes created
+DEBUG : 2021-06-28 19:44:35,020 Processes started
+DEBUG : 2021-06-28 19:44:35,023 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 19:44:35,886 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.7, 'p': 1003.7687, 'h': 52.05, 'rt': 26.55}, {'ox': 10596.0, 'red': 440840.0, 'nh3': 86625.0}, 1.84, 0))
+INFO : 2021-06-28 19:44:40,233 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3322.0))
+INFO : 2021-06-28 19:44:40,983 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.71, 'p': 1003.769, 'h': 52.02, 'rt': 26.6}, {'ox': 10608.0, 'red': 440840.0, 'nh3': 86625.0}, 1.78, 0))
+INFO : 2021-06-28 19:44:46,120 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.71, 'p': 1003.7669, 'h': 52.1, 'rt': 26.55}, {'ox': 10620.0, 'red': 440840.0, 'nh3': 86403.0}, 1.84, 0))
+INFO : 2021-06-28 19:44:46,483 (<MessageType.I2S_MESSAGE: 2>, (57.96, 3357.0))
+INFO : 2021-06-28 19:44:51,259 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.72, 'p': 1003.7723, 'h': 51.67, 'rt': 26.55}, {'ox': 10608.0, 'red': 438139.0, 'nh3': 86292.0}, 1.77, 0))
+DEBUG : 2021-06-28 19:44:51,407 SPMMA app stops...
+
+DEBUG : 2021-06-28 19:53:18,799 Queue and processes created
+DEBUG : 2021-06-28 19:53:18,937 Processes started
+DEBUG : 2021-06-28 19:53:18,950 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 19:53:19,810 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.69, 'p': 1003.7083, 'h': 52.5, 'rt': 26.6}, {'ox': 11131.0, 'red': 440840.0, 'nh3': 87747.0}, 0.05, 0))
+DEBUG : 2021-06-28 19:53:20,350 SPMMA app stops...
+
+DEBUG : 2021-06-28 19:58:44,005 Queue and processes created
+DEBUG : 2021-06-28 19:58:44,134 Processes started
+DEBUG : 2021-06-28 19:58:44,137 i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)
+INFO : 2021-06-28 19:58:45,024 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.5, 'p': 1003.8782, 'h': 52.46, 'rt': 21.65}, {'ox': 11378.0, 'red': 435467.0, 'nh3': 87747.0}, 2.06, 0))
+INFO : 2021-06-28 19:58:49,363 (<MessageType.I2S_MESSAGE: 2>, (0.0, 3323.0))
+INFO : 2021-06-28 19:58:50,122 (<MessageType.I2C_MESSAGE: 1>, ({'t': 30.51, 'p': 1003.8756, 'h': 52.86, 'rt': 26.55}, {'ox': 11365.0, 'red': 435467.0, 'nh3': 87634.0}, 2.14, 0))
+DEBUG : 2021-06-28 19:58:54,764 SPMMA app stops...
+

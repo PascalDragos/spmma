@@ -11,14 +11,15 @@ from modules.adc import ADC
 from modules.ltr import LTR_Wrapper
 
 
-PROXIMTY_SLEEP_TRESHOLD = 1500
-PROXIMTY_NEXT_TRESHOLD = 100
+# valori pentru senzorul de proximitate utilizat ca buton
+PROXIMTY_SLEEP_TRESHOLD = 100
+PROXIMTY_NEXT_TRESHOLD = 20
 
 
-
+# Logger
 l_format = logging.Formatter('%(levelname)s : %(asctime)s %(message)s')  # formatul unei inregistrari
 logger = logging.getLogger("i2c")  # instanta de logger
-logger.setLevel(logging.DEBUG) # afisez informatiile de la debug in sus
+logger.setLevel(logging.DEBUG)  # afisez informatiile de la debug in sus
 handler = TimedRotatingFileHandler('logs/i2c.log', when="midnight", interval=1, encoding='utf8')  # in fiecare zi, alt fisier
 handler.setFormatter(l_format) 
 handler.prefix = "%Y-%m-%d"  # prefixul pentru un fisier
@@ -29,27 +30,31 @@ logger.addHandler(handler)
 # sincronizare cu semafoare
 lock = threading.Lock()
 
+
 # Producer 1
 def i2c_loop(q):
     try:
         print("I2c loop starts...")
         logger.debug("I2c loop starts...")
+
         bme280 = BME280()
+        lock.acquire()
         bme280.set_operation_mode(operation_mode="weather")
+        lock.release()
         adc = ADC()
         ltr = LTR_Wrapper()
 
         logger.debug("Objects created")
 
-        button_delay = 0.1  # seconds
-        button_debounce = 2 # seconds
-        read_delay = 5  # seconds
+        button_delay = 1  # seconds
+        button_debounce = 3 # seconds
+        read_delay = 1  # seconds
 
         logger.debug("Processes start...")
         button_thread(q, ltr, button_delay, button_debounce)
         sensor_thread(q, bme280, adc, ltr, read_delay)
 
-        while(True):
+        while True:
             # for keeping alive
             time.sleep(60*60)
 
@@ -62,6 +67,7 @@ def button_thread(q, ltr, button_delay, button_debounce):
     lock.acquire()
     proximity = ltr.get_proximity()
     lock.release()
+
     if proximity > PROXIMTY_SLEEP_TRESHOLD:
         logger.info((MessageType.BTN_MESSAGE, ButtonType.SLEEP))   
         q.put((MessageType.BTN_MESSAGE, ButtonType.SLEEP))
@@ -69,6 +75,7 @@ def button_thread(q, ltr, button_delay, button_debounce):
         t = threading.Timer(button_debounce, button_thread, [q, ltr, button_delay, button_debounce])
         t.daemon = True
         t.start()
+
     elif proximity > PROXIMTY_NEXT_TRESHOLD:
         logger.info((MessageType.BTN_MESSAGE, ButtonType.NEXT))
         q.put((MessageType.BTN_MESSAGE, ButtonType.NEXT))
@@ -82,12 +89,16 @@ def button_thread(q, ltr, button_delay, button_debounce):
 
 
 def sensor_thread(q, bme280, adc, ltr, read_delay):
+    lock.acquire()
     weather_parameters = bme280.read_and_get_parameters()
     weather_parameters['rt'] = adc.read_temp()
+    lock.release()
 
+    lock.acquire()
     ox = adc.read_OX()
     red = adc.read_RED()
     nh3 = adc.read_NH3()
+    lock.release()
     gases = {"ox": ox, "red": red, "nh3": nh3}
 
     lock.acquire()
@@ -102,15 +113,12 @@ def sensor_thread(q, bme280, adc, ltr, read_delay):
 
     for k, v in gases.items():
         gases[k] = round(v, 0)
-    lux = round(lux, 2)
+    lux = round(lux, 1)
 
     i2c_object = (weather_parameters, gases, lux, proximity)
 
-
-    logger.info((MessageType.I2C_MESSAGE,i2c_object))
+    logger.info((MessageType.I2C_MESSAGE, i2c_object))
     q.put((MessageType.I2C_MESSAGE, i2c_object))
-
-    # print(i2c_object)
 
     t = threading.Timer(read_delay, sensor_thread, [
                         q, bme280, adc, ltr, read_delay])
