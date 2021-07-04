@@ -5,9 +5,8 @@ from smbus import SMBus  # biblioteca pentru i2c
 import struct
 import time
 
-
 CHIP_ID = 0x60
-I2C_ADDRESS_GND = 0x76
+I2C_ADDRESS_GND = 0x76  # adresa I2C
 I2C_ADDRESS_VCC = 0x77
 
 
@@ -80,8 +79,6 @@ class BME280Calibration():
             except AttributeError:
                 pass
 
-
-
     # Functii transcrise din datasheet lui bme280
 
     # Temperatura interna a senzorului necesara calibrarii presiunii si umiditatii
@@ -140,7 +137,7 @@ class BME280:
                 BitField('im_update', 0b00000001),  # 1 when NVM data is being copied
             )),
             Register('CTRL_MEAS', 0xF4, fields=(
-                BitField('osrs_t', 0b11100000,   # Temperature oversampling
+                BitField('osrs_t', 0b11100000,  # Temperature oversampling
                          adapter=LookupAdapter({
                              1: 0b001,
                              2: 0b010,
@@ -148,21 +145,21 @@ class BME280:
                              8: 0b100,
                              16: 0b101
                          })),
-                BitField('osrs_p', 0b00011100,   # Pressure oversampling
+                BitField('osrs_p', 0b00011100,  # Pressure oversampling
                          adapter=LookupAdapter({
                              1: 0b001,
                              2: 0b010,
                              4: 0b011,
                              8: 0b100,
                              16: 0b101})),
-                BitField('mode', 0b00000011,     # Power mode
+                BitField('mode', 0b00000011,  # Power mode
                          adapter=LookupAdapter({
                              'sleep': 0b00,
                              'forced': 0b10,
                              'normal': 0b11})),
             )),
             Register('CTRL_HUM', 0xF2, fields=(
-                BitField('osrs_h', 0b00000111,   # Humidity oversampling
+                BitField('osrs_h', 0b00000111,  # Humidity oversampling
                          adapter=LookupAdapter({
                              1: 0b001,
                              2: 0b010,
@@ -171,7 +168,7 @@ class BME280:
                              16: 0b101})),
             )),
             Register('CONFIG', 0xF5, fields=(
-                BitField('t_sb', 0b11100000,     # Temp standby duration in normal mode
+                BitField('t_sb', 0b11100000,  # Temp standby duration in normal mode
                          adapter=LookupAdapter({
                              0.5: 0b000,
                              62.5: 0b001,
@@ -181,8 +178,9 @@ class BME280:
                              1000: 0b101,
                              10: 0b110,
                              20: 0b111})),
-                BitField('filter', 0b00011100),                   # Controls the time constant of the IIR filter
-                BitField('spi3w_en', 0b0000001, read_only=True),  # Enable 3-wire SPI interface when set to 1. IE: Don't set this bit!
+                BitField('filter', 0b00011100),  # Controls the time constant of the IIR filter
+                BitField('spi3w_en', 0b0000001, read_only=True),
+                # Enable 3-wire SPI interface when set to 1. IE: Don't set this bit!
             )),
             Register('DATA', 0xF7, fields=(
                 BitField('humidity', 0x000000000000FFFF),
@@ -193,27 +191,28 @@ class BME280:
                 BitField('dig_t1', 0xFFFF << 16 * 12, adapter=U16Adapter()),  # 0x88 0x89
                 BitField('dig_t2', 0xFFFF << 16 * 11, adapter=S16Adapter()),  # 0x8A 0x8B
                 BitField('dig_t3', 0xFFFF << 16 * 10, adapter=S16Adapter()),  # 0x8C 0x8D
-                BitField('dig_p1', 0xFFFF << 16 * 9, adapter=U16Adapter()),   # 0x8E 0x8F
-                BitField('dig_p2', 0xFFFF << 16 * 8, adapter=S16Adapter()),   # 0x90 0x91
-                BitField('dig_p3', 0xFFFF << 16 * 7, adapter=S16Adapter()),   # 0x92 0x93
-                BitField('dig_p4', 0xFFFF << 16 * 6, adapter=S16Adapter()),   # 0x94 0x95
-                BitField('dig_p5', 0xFFFF << 16 * 5, adapter=S16Adapter()),   # 0x96 0x97
-                BitField('dig_p6', 0xFFFF << 16 * 4, adapter=S16Adapter()),   # 0x98 0x99
-                BitField('dig_p7', 0xFFFF << 16 * 3, adapter=S16Adapter()),   # 0x9A 0x9B
-                BitField('dig_p8', 0xFFFF << 16 * 2, adapter=S16Adapter()),   # 0x9C 0x9D
-                BitField('dig_p9', 0xFFFF << 16 * 1, adapter=S16Adapter()),   # 0x9E 0x9F
-                BitField('dig_h1', 0x00FF),                                   # 0xA1 uint8
+                BitField('dig_p1', 0xFFFF << 16 * 9, adapter=U16Adapter()),  # 0x8E 0x8F
+                BitField('dig_p2', 0xFFFF << 16 * 8, adapter=S16Adapter()),  # 0x90 0x91
+                BitField('dig_p3', 0xFFFF << 16 * 7, adapter=S16Adapter()),  # 0x92 0x93
+                BitField('dig_p4', 0xFFFF << 16 * 6, adapter=S16Adapter()),  # 0x94 0x95
+                BitField('dig_p5', 0xFFFF << 16 * 5, adapter=S16Adapter()),  # 0x96 0x97
+                BitField('dig_p6', 0xFFFF << 16 * 4, adapter=S16Adapter()),  # 0x98 0x99
+                BitField('dig_p7', 0xFFFF << 16 * 3, adapter=S16Adapter()),  # 0x9A 0x9B
+                BitField('dig_p8', 0xFFFF << 16 * 2, adapter=S16Adapter()),  # 0x9C 0x9D
+                BitField('dig_p9', 0xFFFF << 16 * 1, adapter=S16Adapter()),  # 0x9E 0x9F
+                BitField('dig_h1', 0x00FF),  # 0xA1 uint8
             ), bit_width=26 * 8),
             Register('CALIBRATION2', 0xE1, fields=(
-                BitField('dig_h2', 0xFFFF0000000000, adapter=S16Adapter()),   # 0xE1 0xE2
-                BitField('dig_h3', 0x0000FF00000000),                         # 0xE3 uint8
-                BitField('dig_h4', 0x000000FFFF0000, adapter=H4Adapter()),    # 0xE4 0xE5[3:0]
-                BitField('dig_h5', 0x00000000FFFF00, adapter=H5Adapter()),    # 0xE5[7:4] 0xE6
-                BitField('dig_h6', 0x000000000000FF, adapter=S8Adapter())     # 0xE7 int8
+                BitField('dig_h2', 0xFFFF0000000000, adapter=S16Adapter()),  # 0xE1 0xE2
+                BitField('dig_h3', 0x0000FF00000000),  # 0xE3 uint8
+                BitField('dig_h4', 0x000000FFFF0000, adapter=H4Adapter()),  # 0xE4 0xE5[3:0]
+                BitField('dig_h5', 0x00000000FFFF00, adapter=H5Adapter()),  # 0xE5[7:4] 0xE6
+                BitField('dig_h6', 0x000000000000FF, adapter=S8Adapter())  # 0xE7 int8
             ), bit_width=7 * 8)
         ))
 
-    def setup(self, mode='normal', temperature_oversampling=16, pressure_oversampling=16, humidity_oversampling=16, temperature_standby=500):
+    def setup(self, mode='normal', temperature_oversampling=16, pressure_oversampling=16, humidity_oversampling=16,
+              temperature_standby=500):
         if self.__is_setup:
             return
         self.__is_setup = True
@@ -221,13 +220,14 @@ class BME280:
         self.__bme280.select_address(self.__i2c_addr)
         self.__mode = mode
 
-        # if mode == "forced":
-        #     mode = "sleep"
+        if mode == "forced":
+            mode = "sleep"
 
         try:
             chip = self.__bme280.get('CHIP_ID')
             if chip.id != CHIP_ID:
-                raise RuntimeError("Unable to find bme280 on 0x{:02x}, CHIP_ID returned {:02x}".format(self.__i2c_addr, chip.id))
+                raise RuntimeError(
+                    "Unable to find bme280 on 0x{:02x}, CHIP_ID returned {:02x}".format(self.__i2c_addr, chip.id))
         except IOError:
             raise RuntimeError("Unable to find bme280 on 0x{:02x}, IOError".format(self.__i2c_addr))
 
@@ -237,39 +237,36 @@ class BME280:
         self.__bme280.set('CTRL_HUM', osrs_h=humidity_oversampling)
 
         self.__bme280.set('CTRL_MEAS',
-                         mode=mode,
-                         osrs_t=temperature_oversampling,
-                         osrs_p=pressure_oversampling)
+                          mode=mode,
+                          osrs_t=temperature_oversampling,
+                          osrs_p=pressure_oversampling)
 
         self.__bme280.set('CONFIG',
-                         t_sb=temperature_standby,
-                         filter=2)
+                          t_sb=temperature_standby,
+                          filter=2)
 
         self.__calibration.set_from_namedtuple(self.__bme280.get('CALIBRATION'))
         self.__calibration.set_from_namedtuple(self.__bme280.get('CALIBRATION2'))
-
 
     # Functie adaugata la driverul initial
     def set_operation_mode(self, operation_mode="weather"):
         # forced mode = senzorul citeste la interventia mea
         # normal mode = senzorul citeste periodic, T = 0.5 ms - 1 s
         # sleep mode
-        
+
         # recomandarile producatorului (Bosch) asupra modurilor de functionare
         operation_mode_map = {
-            "weather" : {"mode" : "forced", "oversampling" : {"pressure" : 1, "temperature" : 1, "humidity" : 1}},
-            "humidity" : {"mode" : "forced", "oversampling" : {"pressure" : 0, "temperature" : 1, "humidity" : 1}}, 
-            "navigation" : {"mode" : "normal", "oversampling" : {"pressure" : 16, "temperature" : 2, "humidity" : 1}},
-            "accuracy" : {"mode" : "forced", "oversampling" : {"pressure" : 16, "temperature" : 16, "humidity" : 16}}
-
+            "weather": {"mode": "forced", "oversampling": {"pressure": 1, "temperature": 1, "humidity": 1}},
+            "humidity": {"mode": "forced", "oversampling": {"pressure": 0, "temperature": 1, "humidity": 1}},
+            "navigation": {"mode": "normal", "oversampling": {"pressure": 16, "temperature": 2, "humidity": 1}},
+            "accuracy": {"mode": "forced", "oversampling": {"pressure": 16, "temperature": 16, "humidity": 16}}
         }
-        
-        self.setup(mode=operation_mode_map[operation_mode]["mode"], 
-                    temperature_oversampling=operation_mode_map[operation_mode]["oversampling"]["temperature"], 
-                    pressure_oversampling=operation_mode_map[operation_mode]["oversampling"]["pressure"], 
-                    humidity_oversampling=operation_mode_map[operation_mode]["oversampling"]["humidity"]) 
-   
-        
+
+        self.setup(mode=operation_mode_map[operation_mode]["mode"],
+                   temperature_oversampling=operation_mode_map[operation_mode]["oversampling"]["temperature"],
+                   pressure_oversampling=operation_mode_map[operation_mode]["oversampling"]["pressure"],
+                   humidity_oversampling=operation_mode_map[operation_mode]["oversampling"]["humidity"])
+
     def read_parameters(self):
         if self.__mode == "forced":
             # Genereaza o citire
@@ -277,21 +274,20 @@ class BME280:
             while self.__bme280.get('STATUS').measuring:
                 time.sleep(0.001)
 
-        # citesc ultima valoarea salvata in registru
+        # citesc ultima valoarea salvata in registru pe 64 de biti care contine temperatura, umiditate, presiune
         raw = self.__bme280.get('DATA')
 
-        # temperatura compensata cu cea citita de pe procesor
+        # temperatura fara a fi compensata cu cea citita de pe procesor
         self.temperature = self.__calibration.compensate_temperature(raw.temperature)
         # presiunea compensata cu cu temperatura interna a senzorului, pe baza presiuni se poate calcula altitudinea
         self.pressure = self.__calibration.compensate_pressure(raw.pressure) / 100.0
         # umiditate compensata cu cu temperatura interna a senzorului
         self.humidity = self.__calibration.compensate_humidity(raw.humidity)
-        
 
     # temperatura in grade Celsius, presiunea in hPa (mmHg), umiditatea relativa (%)
     def get_parameters(self):
-        return ({"t":self.temperature,  "p": self.pressure, "h":self.humidity}) 
-    
+        return {"t": self.temperature, "p": self.pressure, "h": self.humidity}
+
     def read_and_get_parameters(self):
         self.read_parameters()
         return self.get_parameters()
@@ -305,8 +301,9 @@ class BME280:
     def get_humidity(self):
         return self.humidity
 
-    def get_altitude(self, qnh=1013.25):
-        t1 = pow(p0 / self.pressure, (1.0 / 5.255)) - 1
-        t2 = self.temperature + 273.15
-        return (t1 * t2 / 0.0065)
-    
+    # p0 este presiunea la nivelul marii
+    def get_altitude(self, p0=1013.25):
+        self.read_parameters()
+        pressure = self.get_pressure()
+        altitude = 44330.0 * (1.0 - pow(pressure / p0, (1.0 / 5.255)))
+        return altitude

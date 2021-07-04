@@ -3,8 +3,8 @@ import time
 
 class LTR_Wrapper():
     # valori din data sheet
-    # gain, min_val, max_val
-    LUXRANGE = [(96,    0.01,    600.0),
+                # gain, min_val, max_val
+    GAIN_RANGE = [(96,    0.01,    600.0),
                 (48,    0.02,    1300.0),
                 (8,     0.125,   8000.0),
                 (4,     0.25,   16000.0),
@@ -12,7 +12,7 @@ class LTR_Wrapper():
                 (1,     1.0,    64000.0)]  
     def __init__(self):
         self.ltr559 = LTR559()
-        self.ltr559.set_light_integration_time_ms(100)
+        self.ltr559.set_light_integration_time_ms(100) # default in datasheet
     
     def get_proximity(self):
         return self.ltr559.get_proximity(passive=False)
@@ -27,7 +27,7 @@ class LTR_Wrapper():
         gain = self.ltr559.get_gain()
         
         biggest_gain = 1 
-        for range in self.LUXRANGE:
+        for range in self.GAIN_RANGE:
             if lux_val < range[2]: 
                 biggest_gain = range[0]
                 break

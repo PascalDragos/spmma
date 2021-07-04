@@ -1,0 +1,6 @@
+done
+Error in atexit._run_exitfuncs:
+Traceback (most recent call last):
+  File "/home/pi/spmma/loops/modules/adc.py", line 14, in cleanup
+    GPIO.output(MICS6814_HEATER_PIN, 0)
+NameError: name 'MICS6814_HEATER_PIN' is not defined

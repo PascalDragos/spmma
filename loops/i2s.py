@@ -21,21 +21,29 @@ def i2s_loop(q):
     try:
         print("I2s loop starts...")
         logger.debug("I2s loop starts...")
-        mic_delay = 1  # seconds
-        mic = Microphone(duration=1)
+        mic_delay = 0.5  # seconds
+        mic = Microphone(duration=10)
         logger.debug("I2s objects created...")
 
         while True:
             db, freq = mic.get_noise()
-
-            db = round(db, 2)
-            freq = round(freq, 0)
-
-            logger.info((db, freq))
-            # print((db, freq))
-            q.put((MessageType.I2S_MESSAGE, (db, freq)))
             
-            time.sleep(mic_delay)
+            db = list(filter(lambda x: x > 20, 
+                list(map(lambda x: round(x, 2), db))))
+            freq = list(map(lambda x: round(x, 2), freq))
+            
+            obj = (sum(db)/len(db), sum(freq)/len(freq))
+            logger.info(obj)
+            print(obj)
+            q.put((MessageType.I2S_MESSAGE, obj))
+
+            # for i in range(len(db)):
+            #     obj = (db[i], freq[i])
+            #     logger.info(obj)
+            #     print(obj)
+            #     q.put((MessageType.I2S_MESSAGE, obj))
+                
+            #time.sleep(mic_delay)
     except KeyboardInterrupt:
         print("I2S loop stops...")
         logger.debug("I2s loop stops...\n")

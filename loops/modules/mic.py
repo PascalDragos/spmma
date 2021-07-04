@@ -2,10 +2,11 @@ import sounddevice
 import numpy
 import sys
 import math
+import pickle
 
 
 class Microphone():
-    def __init__(self,
+    def __init__(self, 
                  sample_rate=22000,  #  Sample rate in Hz
                  duration=1):  # Duration, in seconds, of noise sample capture
 
@@ -14,6 +15,7 @@ class Microphone():
 
         self.noise_floor = sys.float_info.max
         self.max_dbSPL = 0
+        self.it = 0
 
 
     def record(self):
@@ -28,47 +30,61 @@ class Microphone():
 
 
     def get_noise(self):
-        pcm = self.record()[20:]
+        big_pcm = self.record()[int((self.duration-2)*self.sample_rate):]
+        pcms = numpy.split(big_pcm, 10)
 
-        vmax = numpy.amax(pcm)
-        vmin = numpy.amin(pcm)
-        
-        DCoffset = numpy.average(pcm) # sunetul nu e centrat in 0
-        vmax_noDC = vmax - DCoffset # il centrez
-        vmin_noDC = vmin - DCoffset # il centrez
-        
-        vabs = abs(vmax_noDC) if (abs(vmax_noDC) > abs(vmin_noDC)) else abs(vmin_noDC)  # varful
+        dbSPLs = []
+        freqs = []
 
-        if vabs < self.noise_floor:
-            self.noise_floor = vabs
-        
-        vfinal = vabs - self.noise_floor
+        for pcm in pcms:
+            vmax = numpy.amax(pcm)
+            vmin = numpy.amin(pcm)
+            
+            # DCoffset = numpy.average(pcm) # sunetul nu e centrat in 0
+            DCoffset = (vmax + vmin) / 2
+            vmax_noDC = vmax - DCoffset # il centrez
+            vmin_noDC = vmin - DCoffset # il centrez
+            
+            vabs = abs(vmax_noDC) if (abs(vmax_noDC) > abs(vmin_noDC)) else abs(vmin_noDC)  # varful
 
-       
-        dbSPL = PCM_to_dbSPL(vfinal)
+            if vabs < self.noise_floor:
+                self.noise_floor = vabs
+            
+            vfinal = vabs - self.noise_floor - 2
 
-        if dbSPL > self.max_dbSPL:
-            self.max_dbSPL = dbSPL
+            dbSPL = PCM_to_dbSPL(vfinal)
 
-        magnitude = numpy.abs(numpy.fft.rfft(pcm))
-        freq = numpy.mean(magnitude)
+            if dbSPL > self.max_dbSPL:
+                self.max_dbSPL = dbSPL
 
-        return dbSPL, freq
+            magnitude = numpy.abs(numpy.fft.rfft(pcm))
+            freq = numpy.mean(magnitude)
+            dbSPLs.append(dbSPL)
+            freqs.append(freq)
+        return dbSPLs, freqs
 
 
-    def get_noise_debug(self, fo):
-        pcm = self.record()[20:]
-        
+    def get_noise_debug(self, fo):        
+        # with open('mic.pcm','w') as fpcm:
+        #     for val in pcm:
+        #         fpcm.write(str(val) + " ")
+        #     fpcm.write("\n")
+
         # numpy.savetxt('data2.csv', pcm, delimiter=',', fmt = "%d")
-        
+        # print(pcm)
+        pcm = self.record()[int((self.duration-1)*self.sample_rate):]
+
+
         vmax = numpy.amax(pcm)
         vmin = numpy.amin(pcm)
         
-        DCoffset = numpy.average(pcm) # sunetul nu e centrat in 0
+        # DCoffset = numpy.average(pcm) # sunetul nu e centrat in 0
+        DCoffset = (vmax + vmin) / 2
         vmax_noDC = vmax - DCoffset # il centrez
         vmin_noDC = vmin - DCoffset # il centrez
         
         vabs = abs(vmax_noDC) if (abs(vmax_noDC) > abs(vmin_noDC)) else abs(vmin_noDC)  # varful
+        # vabs = (vmax - vmin)/2
 
         if vabs < self.noise_floor:
             self.noise_floor = vabs
@@ -80,7 +96,6 @@ class Microphone():
         if dbSPL > self.max_dbSPL:
             self.max_dbSPL = dbSPL
 
-        fo.write('{:5d}'.format(0))
         fo.write(',{:+10.0f}'.format(vmin))
         fo.write(',{:+10.0f}'.format(vmax))
         fo.write(',{:+10.0f}'.format(DCoffset))
@@ -96,17 +111,19 @@ class Microphone():
         magnitude = numpy.abs(numpy.fft.rfft(pcm))
         freq = numpy.mean(magnitude)
 
-        print(freq)
+        print(dbSPL)
         return dbSPL, freq
   
+
 def Signed32_to_Signed18(x):
-    return x / 0x4000
+    return x >> 14
+
 
 def PCM_to_dbSPL(sample):
     FSdbSPL = 120  # full scale db SPL value
     res = 0.0
     if (sample > 0):
-        dbFS = 20 * math.log10(sample/0x3ffff)  # 18 biti
+        dbFS = 20 * math.log10(sample/0x1ffff)  # 18 biti
         res = FSdbSPL + dbFS
     return res
 
@@ -116,7 +133,11 @@ if __name__ == "__main__":
     import time
     fo = open('SPL-Test.csv','w')
     fo.write('t,vmin,vmax,DCOFFSET,vmin_nodc,vmax_nodc,vabs,noisefloor,vfinal,dbSPL,maxSPL\n')
-    mic = Microphone()
-    while True:
-        mic.get_noise_debug(fo)
-        time.sleep(1)
+    # mic = Microphone(duration=10)
+    # while True:
+    #     mic.get_noise_debug(fo)
+    #     time.sleep(0.5)
+    
+    mic = Microphone(duration=5)
+    pcm = mic.record()[int(0*5500):]
+    numpy.savetxt("abc.csv", pcm, delimiter =",")
