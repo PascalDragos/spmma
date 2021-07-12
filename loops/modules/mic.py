@@ -111,7 +111,6 @@ class Microphone():
         magnitude = numpy.abs(numpy.fft.rfft(pcm))
         freq = numpy.mean(magnitude)
 
-        print(dbSPL)
         return dbSPL, freq
   
 

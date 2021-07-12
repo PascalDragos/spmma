@@ -13,7 +13,7 @@ with open("gas.txt", "a") as gas_file:
             gases = {"ox": ox, "red": red, "nh3": nh3}
             gas_file.write(str(gases) +"\n")
             #print(gases)
-            time.sleep(5*60)
+            time.sleep(60)
     except:
         pass
 

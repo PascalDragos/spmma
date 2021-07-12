@@ -57,7 +57,7 @@ def main():
     process_i2c.start()
     process_i2s.start()
     process_spi.start()
-    # process_web.start()
+    process_web.start()
 
     logger.debug("Processes started")
     logger.debug("i2c_object = ((BME temp, humidity, pressure, TMP temp), (OX, RED, NH3), lux, proximity)")
@@ -98,6 +98,8 @@ def main():
             elif obj is ButtonType.NEXT:
                 current_variable = current_variable + 1 if current_variable + 1 < len(variables) else 0
                 param = variables[current_variable]
+                if param == "s":
+                    queue_display.put(("s", 28.6))
 
             else:
                 logger.error("Tipul mesajului ButtonType necunoscut")

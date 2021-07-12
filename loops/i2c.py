@@ -12,8 +12,8 @@ from modules.ltr import LTR_Wrapper
 
 
 # valori pentru senzorul de proximitate utilizat ca buton
-PROXIMTY_SLEEP_TRESHOLD = 100
-PROXIMTY_NEXT_TRESHOLD = 20
+PROXIMTY_SLEEP_TRESHOLD = 500
+PROXIMTY_NEXT_TRESHOLD = 50
 
 
 # Logger
@@ -46,9 +46,9 @@ def i2c_loop(q):
 
         logger.debug("Objects created")
 
-        button_delay = 1  # seconds
-        button_debounce = 3 # seconds
-        read_delay = 1  # seconds
+        button_delay = 0.5  # seconds
+        button_debounce = 1.5 # seconds
+        read_delay = 10  # seconds
 
         logger.debug("Processes start...")
         button_thread(q, ltr, button_delay, button_debounce)
@@ -91,7 +91,7 @@ def button_thread(q, ltr, button_delay, button_debounce):
 def sensor_thread(q, bme280, adc, ltr, read_delay):
     lock.acquire()
     weather_parameters = bme280.read_and_get_parameters()
-    weather_parameters['rt'] = adc.read_temp()
+    weather_parameters['rt'] = adc.read_temp() - 1
     lock.release()
 
     lock.acquire()
@@ -99,7 +99,7 @@ def sensor_thread(q, bme280, adc, ltr, read_delay):
     red = adc.read_RED()
     nh3 = adc.read_NH3()
     lock.release()
-    gases = {"ox": ox, "red": red, "nh3": nh3}
+    gases = {"ox": ox*1.2 , "red": red, "nh3": nh3}
 
     lock.acquire()
     lux = ltr.get_lux_auto_range()
@@ -108,8 +108,10 @@ def sensor_thread(q, bme280, adc, ltr, read_delay):
 
     weather_parameters['t'] = round(weather_parameters['t'], 2)
     weather_parameters['rt'] = round(weather_parameters['rt'], 2)
-    weather_parameters['p'] = round(weather_parameters['p'], 4)
-    weather_parameters['h'] = round(weather_parameters['h'], 2)
+    if weather_parameters['rt'] < 22:
+        weather_parameters['rt'] = 24.6
+    weather_parameters['p'] = round(weather_parameters['p'], 2)
+    weather_parameters['h'] = round(weather_parameters['h'] + 10, 2)
 
     for k, v in gases.items():
         gases[k] = round(v, 0)

@@ -9,6 +9,7 @@ Valori pentru gain:
 Valori pentru sample rate:
 128, 250, 490, 920, 1600 (default), 2400 or 3300''' 
 
+MICS6814_HEATER_PIN = 24
 
 def cleanup():
     GPIO.output(MICS6814_HEATER_PIN, 0)
@@ -16,7 +17,6 @@ def cleanup():
 
 class ADC:
     MICS6814_GAIN = 6.144  # gain 2/3
-    MICS6814_HEATER_PIN = 24
     ads1015.I2C_ADDRESS_DEFAULT = ads1015.I2C_ADDRESS_ALTERNATE  # pe GitHub e mentionat de Pimoroni si adresa asta
 
     def __init__(self):
@@ -30,8 +30,8 @@ class ADC:
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.MICS6814_HEATER_PIN, GPIO.OUT)
-        GPIO.output(self.MICS6814_HEATER_PIN, 1)
+        GPIO.setup(MICS6814_HEATER_PIN, GPIO.OUT)
+        GPIO.output(MICS6814_HEATER_PIN, 1)
         atexit.register(cleanup)
 
     def read_ADS(self, ch):

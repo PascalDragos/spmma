@@ -2,6 +2,7 @@ import requests
 import datetime
 import json
 import logging
+import functools
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -37,6 +38,7 @@ def web_loop(q):
 
         web_session = requests.Session()
         web_session.headers.update({"pass": cfg["password"]})
+        web_session.request = functools.partial(web_session.request, timeout=15*60)
 
         while True:
             (type, obj) = q.get()  # blocanta

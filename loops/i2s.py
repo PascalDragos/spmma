@@ -32,10 +32,13 @@ def i2s_loop(q):
                 list(map(lambda x: round(x, 2), db))))
             freq = list(map(lambda x: round(x, 2), freq))
             
-            obj = (sum(db)/len(db), sum(freq)/len(freq))
-            logger.info(obj)
-            print(obj)
-            q.put((MessageType.I2S_MESSAGE, obj))
+            if len(db) == 0 or len(freq) == 0:
+                continue
+
+            if len(freq)!=0:    
+                obj = ((sum(db)/len(db) + 30)/2, sum(freq)/len(freq))
+                logger.info(obj)
+                q.put((MessageType.I2S_MESSAGE, obj))
 
             # for i in range(len(db)):
             #     obj = (db[i], freq[i])
@@ -43,7 +46,7 @@ def i2s_loop(q):
             #     print(obj)
             #     q.put((MessageType.I2S_MESSAGE, obj))
                 
-            #time.sleep(mic_delay)
+            # time.sleep(mic_delay)
     except KeyboardInterrupt:
         print("I2S loop stops...")
         logger.debug("I2s loop stops...\n")

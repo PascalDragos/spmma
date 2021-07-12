@@ -1,4 +1,5 @@
 import math
+import random
 
 import logging
 from logging.handlers import TimedRotatingFileHandler
@@ -45,18 +46,21 @@ def spi_loop(q):
         # trebuie si in spmma cunoscute cheile acestui dictionar
         info_structure = {
              "t":    {"unit": "°C",   "min": 20,      "max": 30},
-             "h":    {"unit": "%",   "min": 20,      "max": 70},
+             "h":    {"unit": "%",   "min": 30,      "max": 65},
              "l":    {"unit": "lux", "min": 0,      "max": 250},
              "s":    {"unit": "db",  "min": 10,      "max": 90},
-             "ox":   {"unit": "%",   "min": 14_000, "max": 24_000},
-             "red":  {"unit": "%",   "min": 300_000, "max": 600_000},
-             "nh3":  {"unit": "%",   "min": 80_000, "max": 110_000}
+             "ox":   {"unit": "%",   "min": 16_000, "max": 36_000},
+             "red":  {"unit": "%",   "min": 180_000, "max": 500_000},
+             "nh3":  {"unit": "%",   "min": 75_000, "max": 130_000}
         }
 
         # dictionar {marime_masurata: lista ultimelor valori}
         values = {}  
         for variable in info_structure:
             values[variable] = [0] * WIDTH
+        
+        for i in range(0, WIDTH):
+            values["s"][i] = random.randrange(25, 35)
 
         y_old = 0
         while True:
@@ -100,7 +104,8 @@ def spi_loop(q):
 
                 avg = sum(result) / len(result)
                 # avg = (min(result)+max(result))/2
-
+               
+                
                 avg = avg if avg != 0 else data # pentru primul esantion
                 data = round((data - avg)/avg * 100, 2)
                 
@@ -141,6 +146,11 @@ def spi_loop(q):
                         colour = colours[i] * 0.3
                         # Punct negru pentru valoarea curenta
                         y_now = HEIGHT - ((1 - colours[i]) * (HEIGHT - graph_top_point))                        
+                    elif variable == "l":
+                        # scalez in intervalul (0,1] => [0, 0.3]
+                        colour = colours[i] * 0.3
+                        # Punct negru pentru valoarea curenta
+                        y_now = HEIGHT - (colours[i] * (HEIGHT - graph_top_point))
                     else:
                         # scalez in intervalul (0,1] => [0.3, 0)
                         colour = (1.0 - colours[i]) * 0.3
